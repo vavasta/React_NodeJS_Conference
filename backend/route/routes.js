@@ -21,20 +21,65 @@ router.post("/addParticipant", async (req, res) => {
   };
   sgMail.send(msg);
 });
+//UPDATE PARTICIPANT
+router.post("/updateParticipant", async (req, res) => {
+  const { obj, id } = req.body;
+  console.log("REQ", req.body);
+  const Participant = await Participants.findByIdAndUpdate(id, obj, {
+    new: true
+  });
 
+  const API_KEY =
+    "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";
+
+  sgMail.setApiKey(API_KEY);
+  const approved = "Your registration has beed approved by Admin!";
+  const declined = "Your registration has beed declined by Admin!";
+  const msgDeclined = {
+    to: `${req.body.obj.email}`,
+    from: "vavasta96@gmail.com",
+    subject: "Registration info!!!",
+    text: req.body.obj.status === "APPROVED" ? approved : declined
+  };
+
+  sgMail.send(msgDeclined);
+  res.send(Participant);
+});
 //ADD USERS //NO API//USE ONLY WITH POSTMAN
-router.post("/addUser", async (req, res) => {
-  let EmailAndPass = req.body;
-  if (EmailAndPass.email === "vavasta96@gmail.com") {
-    EmailAndPass = { ...EmailAndPass, isSuperAdmin: true };
-  } else if (EmailAndPass.email === "admin@gmail.com") {
-    EmailAndPass = { ...EmailAndPass, isAdmin: true };
-  }
-  let User = new Users(EmailAndPass);
+router.post("/createUser", async (req, res) => {
+  console.log("REQ", req.body);
+  let User = new Users(req.body);
   User.save();
   res.send(User);
 });
 
+//UPDATE USER
+router.post("/updateUser", async (req, res) => {
+  const { obj, id } = req.body;
+  const user = await Users.findByIdAndUpdate(id, obj, { new: true });
+  res.send(user);
+});
+//SOFT DELETE USER
+router.post("/softDeleteUser", async (req, res) => {
+  const user = await Users.findOne({ _id: req.body._id });
+  user.isDeleted = true;
+  user.save();
+  res.send(user);
+});
+//DELETE USER
+router.post("/DeleteUser", async (req, res) => {
+  console.log("req", req.body);
+  const user = await Users.findOneAndDelete({ _id: req.body._id });
+  console.log("USER", user);
+  res.send(user);
+});
+//RESTORE USER
+router.post("/RestoreUser", async (req, res) => {
+  const user = await Users.findOne({ _id: req.body._id });
+  user.isDeleted = false;
+  user.save();
+  res.send(user);
+});
 //LOGIN
 router.post("/login", async (req, res) => {
   const user = await Users.findOne({ email: req.body.email });

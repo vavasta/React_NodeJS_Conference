@@ -12,7 +12,8 @@ const ParticipantsSchema = new Schema(
     gender: String,
     role: String,
     dateOfBirth: Number,
-    country: String
+    country: String,
+    status: String
   },
   { collection: "participants" }
 );
