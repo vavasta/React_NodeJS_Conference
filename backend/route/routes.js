@@ -6,20 +6,42 @@ const Users = require("../models/Users");
 const sgMail = require("@sendgrid/mail");
 //ADD PARTICIPANT
 router.post("/addParticipant", async (req, res) => {
-  let Participant = new Participants(req.body);
-  Participant.save();
-  const API_KEY =
-    "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";
+  console.log("REQ", req.body);
+  const findedPart = await Participants.findOne({ email: req.body.email });
+  console.log("find", findedPart);
+  if (findedPart || req.body === undefined) {
+    res.status(200).send("Error");
+  } else {
+    let Participant = new Participants(await req.body);
+    Participant.save();
+    const API_KEY =
+      "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";
 
-  sgMail.setApiKey(API_KEY);
-  const msg = {
-    to: `${req.body.email}`,
-    from: "vavasta96@gmail.com",
-    subject: "Congrats!!!",
-    text: "Thank you for registration! See you soon!"
-    // html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-  };
-  sgMail.send(msg);
+    sgMail.setApiKey(API_KEY);
+    const msg = {
+      to: `${req.body.email}`,
+      from: "vavasta96@gmail.com",
+      subject: "Congrats!!!",
+      text: "Thank you for registration! See you soon!"
+      // html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+    };
+    sgMail.send(msg);
+    res.send(Participant);
+  }
+  // let Participant = new Participants(await req.body);
+  // try {
+  //   const data = {
+  //     Participant,
+  //     message: "created!",
+  //     statusCode: 0
+  //   };
+  //   await Participant.save();
+  //   res.status(201).send(data);
+  // } catch (e) {
+  //   const data = { message: e.message, statusCode: 1 };
+
+  //   res.status(200).send(data);
+  // }
 });
 //UPDATE PARTICIPANT
 router.post("/updateParticipant", async (req, res) => {

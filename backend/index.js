@@ -9,6 +9,7 @@ var cors = require("cors");
 const API_PORT = 4000;
 const app = express();
 app.use(cors());
+app.use(express.json());
 const router = express.Router();
 const bodyParser = require("body-parser");
 const dbRoute = process.env.dbRoute;
@@ -16,7 +17,8 @@ const dbRoute = process.env.dbRoute;
 mongoose.connect(dbRoute, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
-  useFindAndModify: false
+  useFindAndModify: false,
+  useCreateIndex: true
 });
 let db = mongoose.connection;
 db.once("open", () => console.log("connected to DB"));

@@ -3,7 +3,13 @@ const Schema = mongoose.Schema;
 
 const ParticipantsSchema = new Schema(
   {
-    email: String,
+    email: {
+      type: String,
+      trim: true,
+      required: true,
+      unique: true,
+      lowercase: true
+    },
     firstname: String,
     lastname: String,
     companyname: String,
